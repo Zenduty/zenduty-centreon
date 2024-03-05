@@ -16,11 +16,7 @@ local sc_macros = require("centreon-stream-connectors-lib.sc_macros")
 local sc_flush = require("centreon-stream-connectors-lib.sc_flush")
 
 --------------------------------------------------------------------------------
--- Classe event_queue
---------------------------------------------------------------------------------
-
---------------------------------------------------------------------------------
--- Classe event_queue
+-- Class event_queue
 --------------------------------------------------------------------------------
 
 local EventQueue = {}
@@ -197,7 +193,6 @@ function EventQueue:format_event_host()
       class = "host",
       custom_details = zenduty_custom_details,
     },
-    zenduty_integration_url = self.sc_params.params.zenduty_integration_url,
     event_action = self.state_to_severity_mapping[event.state].action,
     entity_id = event.host_id .. "_H",
     client = self.sc_params.params.client,
@@ -285,7 +280,6 @@ function EventQueue:format_event_service()
       class = "service",
       custom_details = zenduty_custom_details,
     },
-    zenduty_integration_url = self.sc_params.params.zenduty_integration_url,
     event_action = self.state_to_severity_mapping[event.state].action,
     entity_id = event.host_id .. "_" .. event.service_id,
     client = self.sc_params.params.client,
@@ -401,11 +395,11 @@ function EventQueue:send_data(payload, queue_metadata)
   
   -- Handling the return code
   local retval = false
-  if http_response_code == 200 then
+  if http_response_code == 200 or http_response_code == 400 or http_response_code == 201 then
     self.sc_logger:info("[EventQueue:send_data]: HTTP POST request successful: return code is " .. tostring(http_response_code))
     retval = true
   else
-    self.sc_logger:error("[EventQueue:send_data]: HTTP POST request FAILED, return code is " .. tostring(http_response_code) .. ". Message is: " .. tostring(http_response_body))
+  self.sc_logger:error("[EventQueue:send_data]: HTTP POST request FAILED, return code is " .. tostring(http_response_code) .. ". Message is: " .. tostring(http_response_body))
   end
   
   return retval
@@ -487,7 +481,6 @@ function flush()
   -- there are events in the queue but they were not ready to be send
   return false
 end
-
 
 
 
